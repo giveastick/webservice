@@ -11,7 +11,8 @@
 |
 */
 
-Route::get('/', function()
-{
-	return View::make('hello');
+//Route::get('/{nom}/{prenom}', 'HomeController@helloJson');
+Route::get('/createuser/{nick}', 'HomeController@createUser');
+Route::get('/', function(){
+   echo 'Coucou, environnement is ' . app()->environment();
 });
