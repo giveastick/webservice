@@ -11,8 +11,5 @@
 |
 */
 
-//Route::get('/{nom}/{prenom}', 'HomeController@helloJson');
-Route::get('/createuser/{nick}', 'HomeController@createUser');
-Route::get('/', function(){
-   echo 'Coucou, environnement is ' . app()->environment();
-});
+Route::get('/sticks/{nickname}/{group}', 'MainController@getSticks');
+Route::post('/sticks/','MainController@postStick');

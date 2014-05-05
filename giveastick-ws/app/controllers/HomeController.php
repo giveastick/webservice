@@ -22,10 +22,6 @@ class HomeController extends BaseController {
 
     public function createUser($nick)
     {
-        $user = new User;
-        $user->nick = 'max.fl';
-        $dbStatus = $user->save();
-
         return Response::json(array($dbStatus));
     }
 
