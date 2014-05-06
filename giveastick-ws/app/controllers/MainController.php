@@ -8,6 +8,9 @@ class MainController extends BaseController {
         
         $dt = \Carbon\Carbon::now();
         
+        $this->_formatString($_nickname, 'nickname');
+        $this->_formatString($_group, 'group');
+        
         $this->_checkUserExistance($_nickname, $_group);
 
         $sticklist = Stickline::select(array(
@@ -29,24 +32,64 @@ class MainController extends BaseController {
         return Response::json($sticklist);
     }
     
-    public function postStick()
+    public function postStick($_group)
     {
+        $required = array('giver', 'receiver');
+        
+        foreach($required as $field)
+        {
+            if(!Input::has($field))
+                App::abort(500, 'Please provide the post input "' . $field . '"'); 
+        }
+
+        
+        
         $_giver = Input::get('giver');
         $_receiver = Input::get('receiver');
-        $_group = Input::get('channelTag');
-        $_coeff = Input::get('coeff', 1);
+        $_coeff = (int) Input::get('coeff', 1);
+        
+        $lastQuarter = \Carbon\Carbon::now()->subMinutes(15);
+        
+        $this->_formatString($_giver, 'nickname');
+        $this->_formatString($_receiver, 'nickname');
+        $this->_formatString($_group, 'group');
         
         $this->_checkUserExistance($_giver, $_group);
         $this->_checkUserExistance($_receiver, $_group);
         
-        StickLine::create(array(
-           'channelTag'     =>  $_group,
-           'nickname'       =>  $_receiver,
-           'credit'         =>  POST_STICK_CREDIT*$_coeff,
-           'giver'          =>  $_giver
-        ));
+        $countLastQuarter = Stickline:: where('channelTag', $_group)
+                                        ->where('giver', '=', $_giver)
+                                        ->where('created_at','>',$lastQuarter->toDateTimeString())
+                                        ->whereNotNull('reseted_at')
+                                        ->count();
+                                        
+        if($countLastQuarter > 0)
+        {
+            $responseArray = array('result'=>false, 'code'=>'alreadyInTimeLimit');
+        }
+        else
+        {
+            StickLine::create(array(
+                'channelTag'     =>  $_group,
+                'nickname'       =>  $_receiver,
+                'credit'         =>  1*$_coeff,
+                'giver'          =>  $_giver
+            ));
+            
+            $responseArray = array('result'=>true, 'code'=>'ok', 'countLastQuarter'=>$countLastQuarter, 'giver'=>$_giver, 'channelTag'=>$_group, 'created_at'=>$dt->toDateTimeString(), 'countLastQuarter'=>$countLastQuarter);
+        }
         
-        return Response::json(array('giver'=>$_giver, 'receiver'=>$_receiver));
+        return Response::json($responseArray);
+    }
+    
+    public function deleteSticks($_group)
+    {
+        $dt = \Carbon\Carbon::now();
+        
+        $this->_formatString($_group, 'group');
+        
+        $sticklines = Stickline::where('channelTag', $_group);
+        $sticklines->update(array('reseted_at'=>$dt->toDateTimeString()));
     }
     
     protected function _checkUserExistance($_nickname, $_group)
@@ -60,5 +103,10 @@ class MainController extends BaseController {
                'credit'     =>  0,
             ));
         }
+    }
+    
+    protected function _formatString(&$string, $format = null)
+    {
+        
     }
 }

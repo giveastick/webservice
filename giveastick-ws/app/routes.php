@@ -12,4 +12,5 @@
 */
 
 Route::get('/sticks/{nickname}/{group}', 'MainController@getSticks');
-Route::post('/sticks/','MainController@postStick');
+Route::post('/sticks/{group}','MainController@postStick');
+Route::delete('/sticks/{group}', 'MainController@deleteSticks');
