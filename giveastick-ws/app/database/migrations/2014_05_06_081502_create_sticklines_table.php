@@ -19,6 +19,7 @@ class CreateSticklinesTable extends Migration {
 			$table->string('nickname');
 			$table->tinyInteger('credit');
 			$table->dateTime('reseted_at')->nullable();
+			$table->string('giver')->nullable();
 			$table->timestamps();
 		});
 	}
@@ -30,10 +31,7 @@ class CreateSticklinesTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::table('sticks', function(Blueprint $table)
-		{
-			Schema::drop('sticks');
-		});
+		Schema::drop('sticklines');
 	}
 
 }
