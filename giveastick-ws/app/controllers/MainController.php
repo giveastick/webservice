@@ -36,6 +36,8 @@ class MainController extends BaseController {
     {
         $required = array('giver', 'receiver');
         
+       	$dt = \Carbon\Carbon::now();
+        
         foreach($required as $field)
         {
             if(!Input::has($field))

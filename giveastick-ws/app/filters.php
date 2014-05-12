@@ -12,8 +12,8 @@
 */
 
 App::before(function($request)
-{
-	//
+{	
+	$request->header('Access-Control-Allow-Origin', 'http://giveastick.dev');
 });
 
 
