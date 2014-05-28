@@ -12,14 +12,27 @@
 */
 
 App::before(function($request)
-{	
-	$request->header('Access-Control-Allow-Origin', 'http://giveastick.dev');
+{
+    $request->header('Access-Control-Allow-Origin', 'http://giveastick.dev');
 });
 
 
 App::after(function($request, $response)
 {
-	//
+    //
+});
+
+App::error(function(Exception $exception, $code){
+    if( ! in_array($code, array(401, 403, 404, 500))){
+        return;
+    }
+
+    if(in_array($code, array(500)))
+        $retryLater = true;
+    else
+        $retryLater = false;
+
+    return Response::json(array('error'=>'HTTPError', 'statusCode'=>$exception->getStatusCode(), 'httpMessage'=>$exception->getMessage(), 'retryLater'=>$retryLater));
 });
 
 /*
@@ -35,13 +48,13 @@ App::after(function($request, $response)
 
 Route::filter('auth', function()
 {
-	if (Auth::guest()) return Redirect::guest('login');
+    if (Auth::guest()) return Redirect::guest('login');
 });
 
 
 Route::filter('auth.basic', function()
 {
-	return Auth::basic();
+    return Auth::basic();
 });
 
 /*
@@ -57,7 +70,7 @@ Route::filter('auth.basic', function()
 
 Route::filter('guest', function()
 {
-	if (Auth::check()) return Redirect::to('/');
+    if (Auth::check()) return Redirect::to('/');
 });
 
 /*
@@ -73,8 +86,8 @@ Route::filter('guest', function()
 
 Route::filter('csrf', function()
 {
-	if (Session::token() != Input::get('_token'))
-	{
-		throw new Illuminate\Session\TokenMismatchException;
-	}
+    if (Session::token() != Input::get('_token'))
+    {
+        throw new Illuminate\Session\TokenMismatchException;
+    }
 });
