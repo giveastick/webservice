@@ -25,8 +25,8 @@ $app = new Illuminate\Foundation\Application;
 */
 
 $env = $app->detectEnvironment(array(
-	'local' => array('mbp-de-maxime*', 'stan*'),
-        'production' => array('GiveAStick'),
+	'local' => array('mbp-de-maxime*', 'stan*', 'MacBook-Pro-de-*'),
+    'production' => array('GiveAStick'),
 ));
 
 /*
